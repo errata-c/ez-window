@@ -7,13 +7,7 @@ namespace ez::window {
 		void handleInput(std::vector<std::shared_ptr<Window>>& windows) override {
 			ez::InputEvent ev;
 			for (std::shared_ptr<Window>& window : windows) {
-
-				// Allow a event driven mode, with less resource use.
-				while (window->pollInput(ev)) {
-					if (ev.type != ez::InputEventType::None) {
-						window->handleInput(ev);
-					}
-				}
+				window->handleInput();
 			}
 		}
 		void drawWindows(std::vector<std::shared_ptr<Window>>& windows) override {
