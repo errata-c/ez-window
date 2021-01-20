@@ -1,9 +1,30 @@
 #include <ez/window/Engine.hpp>
+#include <SDL2/SDL.h>
 
 namespace ez::window {
 	Engine::Engine()
 		: running(false)
-	{}
+	{
+		int error = 0;
+
+		error = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK);
+		if (error != 0) {
+			printf("Failed to initialize the SDL2 library.\n");
+			const char* desc = SDL_GetError();
+			printf("Error code: %x\n", error);
+			if (desc != nullptr) {
+				printf("Error description: %s\n", desc);
+			}
+			else {
+				printf("Could not retrieve error description.\n");
+			}
+			assert(false);
+		}
+	}
+
+	Engine::~Engine() {
+		SDL_Quit();
+	}
 
 	int Engine::run(int argc, char** argv) {
 		processCommandLine(argc, argv);
@@ -52,7 +73,7 @@ namespace ez::window {
 	}
 
 
-	bool Engine::contains(const Window & window) const noexcept {
+	bool Engine::contains(const Window& window) const noexcept {
 		return contains(&window);
 	}
 	bool Engine::contains(std::string_view name) const noexcept {

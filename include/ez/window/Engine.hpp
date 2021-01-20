@@ -3,17 +3,10 @@
 #include <memory>
 #include <cinttypes>
 #include <string_view>
+#include <cstdio>
+#include <cassert>
 
 #include "Window.hpp"
-
-// Default includes if the user defines a backend
-#if defined(EZ_WINDOW_USE_SFML)
-
-#elif defined(EZ_WINDOW_USE_SDL2)
-
-#elif defined(EZ_WINDOW_USE_GLFW)
-
-#endif
 
 namespace ez_window = ez::window;
 
@@ -23,11 +16,12 @@ namespace ez::window {
 	class Engine {
 	public:
 		Engine();
+		virtual ~Engine();
 		
-		std::shared_ptr<Window> add(Window * window);
+		std::shared_ptr<Window> add(Window* window);
 		void add(std::shared_ptr<Window> window);
 
-		bool contains(const Window & window) const noexcept;
+		bool contains(const Window& window) const noexcept;
 		bool contains(Window const * const window) const noexcept;
 		bool contains(std::string_view name) const noexcept;
 
