@@ -12,6 +12,7 @@
 // Window styling flags
 #include "Style.hpp"
 #include "RenderSettings.hpp"
+#include "Display.hpp"
 
 struct SDL_Window;
 
@@ -47,6 +48,12 @@ namespace ez::window {
 
 		// Is the window grabbing input.
 		bool isInputGrabbed() const;
+		
+		// Is the window the current keyboard focus.
+		bool isKeyboardFocus() const;
+
+		// Is the window the current mouse focus.
+		bool isMouseFocus() const;
 
 		// Set the cursor position relative to this window.
 		void setCursorPos(glm::ivec2 pos);
@@ -91,6 +98,10 @@ namespace ez::window {
 		void setBorderless(bool val);
 
 		bool isBorderless() const;
+
+		DisplayMode getDisplayMode() const noexcept;
+
+		bool setDisplayMode(const DisplayMode& mode);
 
 		/// <summary>
 		/// Returns the render settings that were established for the window.
@@ -199,13 +210,19 @@ namespace ez::window {
 		/// <returns>True if there was an event, false otherwise.</returns>
 		bool pollInput(ez::InputEvent& ev);
 
-		
+		/// <summary>
+		/// Checks if input has been submitted, and also waits for a period of time.
+		/// </summary>
+		/// <param name="ev">The event returned</param>
+		/// <param name="millis">The timeout period in milliseconds</param>
+		/// <returns>True if an event was received, false otherwise.</returns>
+		bool waitInput(ez::InputEvent & ev, int millis);
 	protected:
 
 	private:
 		SDL_Window* window;
 
-		RenderSettings::Type rtype;
+		bool closed;
 		void* rctx;
 		Style style;
 		std::string title;

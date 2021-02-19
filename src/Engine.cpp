@@ -1,9 +1,14 @@
+#include <thread>
+#include <chrono>
+
 #include <ez/window/Engine.hpp>
 #include <SDL2/SDL.h>
 
 namespace ez::window {
 	Engine::Engine()
 		: running(false)
+		, realtime(true)
+		, delayPeriod(std::chrono::microseconds(1000))
 	{
 		int error = 0;
 
@@ -26,17 +31,38 @@ namespace ez::window {
 		SDL_Quit();
 	}
 
-	int Engine::run(int argc, char** argv) {
+	bool Engine::isRealtime() const noexcept {
+		return realtime;
+	}
+	void Engine::setRealtime(bool val) noexcept {
+		realtime = val;
+	}
+
+	void Engine::setDelayMicroseconds(uint64_t period) noexcept {
+		delayPeriod = std::chrono::microseconds(period);
+	}
+	uint64_t Engine::getDelayMicroseconds() const noexcept {
+		return delayPeriod.count();
+	}
+
+	int Engine::run(int argc, char* argv[]) {
 		processCommandLine(argc, argv);
 
 		running = true;
 
 		while (running) {
+			if (!realtime) {
+				while (!hasEvent()) {
+					std::this_thread::sleep_for(delayPeriod);
+					SDL_PumpEvents();
+				}
+			}
+
 			handleInput(windows);
 
-			checkWindows();
-
 			renderInternal();
+
+			checkWindows();
 		}
 
 		return 0;
@@ -51,6 +77,7 @@ namespace ez::window {
 	}
 
 	void Engine::checkWindows() {
+		// Filter out any windows not present anymore.
 		for (std::size_t i = 0; i < windows.size(); ++i) {
 			if (!windows[i]->isOpen()) {
 				std::swap(windows[i], windows.back());
@@ -58,16 +85,19 @@ namespace ez::window {
 			}
 		}
 
+		// Nothing left to do, just finish up.
 		if (windows.size() == 0) {
 			running = false;
 		}
 	}
 
+	// Wrap a newly created window and add to the engine, this is a convienience function
 	std::shared_ptr<Window> Engine::add(Window* window) {
 		windows.push_back(std::shared_ptr<Window>(window));
 		return windows.back();
 	}
 
+	// Take a preexisting window and add it into the render queue.
 	void Engine::add(std::shared_ptr<Window> window) {
 		windows.push_back(window);
 	}
@@ -91,5 +121,9 @@ namespace ez::window {
 			}
 		}
 		return false;
+	}
+
+	bool Engine::hasEvent() const {
+		return SDL_HasEvents(SDL_FIRSTEVENT, SDL_LASTEVENT);
 	}
 }
