@@ -1,14 +1,13 @@
 #include "ez/window/window.hpp"
 #include <ez/input/compat/SDL2.hpp>
 #include "SDL2/SDL.h"
-//#include <ez/gl.hpp>
 
 namespace ez::window {
 	Window::Window(std::string_view _title, glm::ivec2 size, Style _style, const RenderSettings& rs)
 		: style(_style& (Style::Resize | Style::Visible | Style::Close | Style::Fullscreen | Style::HighDPI))
 		, window(nullptr)
 		, title(_title)
-		, rtype(RenderSettings::Type::None)
+		, closed(false)
 		, rctx(nullptr)
 	{
 		int flags = 0;
@@ -25,8 +24,6 @@ namespace ez::window {
 		if (style.noneOf(Style::Resize | Style::Close)) {
 			flags |= SDL_WINDOW_BORDERLESS;
 		}
-
-		rtype = rs.getType();
 
 		switch (rs.getType()) {
 		case RenderSettings::Type::None:
@@ -102,9 +99,9 @@ namespace ez::window {
 	}
 
 	Window::~Window() {
-		if (isOpen()) {
-			close();
-		}
+		SDL_GL_DeleteContext(rctx);
+		SDL_DestroyWindow(window);
+		window = nullptr;
 	}
 
 	std::string Window::getClipboardString() const {
@@ -127,6 +124,14 @@ namespace ez::window {
 	}
 	bool Window::isInputGrabbed() const {
 		return SDL_GetWindowGrab(window) == SDL_TRUE;
+	}
+
+	bool Window::isKeyboardFocus() const {
+		return (SDL_GetWindowFlags(window) & SDL_WINDOW_INPUT_FOCUS) == SDL_WINDOW_INPUT_FOCUS;
+	}
+
+	bool Window::isMouseFocus() const {
+		return (SDL_GetWindowFlags(window) & SDL_WINDOW_MOUSE_FOCUS) == SDL_WINDOW_MOUSE_FOCUS;
 	}
 
 	void Window::raise() {
@@ -189,6 +194,25 @@ namespace ez::window {
 		return (SDL_GetWindowFlags(window) & SDL_WINDOW_BORDERLESS) == SDL_WINDOW_BORDERLESS;
 	}
 
+
+	DisplayMode Window::getDisplayMode() const noexcept {
+		DisplayMode mode{ PixelFormat::Unknown, {0,0}, 0, nullptr };
+		int result = SDL_GetWindowDisplayMode(window, (SDL_DisplayMode*)&mode);
+		if (result == 0) {
+			return DisplayMode{ PixelFormat::Unknown, {0,0}, 0, nullptr };
+		}
+		return mode;
+	}
+	bool Window::setDisplayMode(const DisplayMode& mode) {
+		if (isFullscreen()) {
+			int result = SDL_SetWindowDisplayMode(window, (const SDL_DisplayMode*)&mode);
+			return result != 0;
+		}
+		else {
+			return false;
+		}
+	}
+
 	void Window::setCursorPos(glm::ivec2 pos) {
 		SDL_WarpMouseInWindow(window, pos.x, pos.y);
 	}
@@ -246,18 +270,7 @@ namespace ez::window {
 	}
 
 	void Window::close() {
-		// SDL2 sends two close events for some reason, so just check to make sure this is ok
-		if (isOpen()) {
-			switch (rtype) {
-			case RenderSettings::Type::OpenGL:
-				SDL_GL_DeleteContext(rctx);
-				break;
-			case RenderSettings::Type::Vulkan:
-				break;
-			}
-			SDL_DestroyWindow(window);
-			window = nullptr;
-		}
+		closed = true;
 	}
 	void Window::setVisible(bool val) {
 		if (val) {
@@ -287,7 +300,7 @@ namespace ez::window {
 	}
 
 	bool Window::isOpen() const {
-		return window != nullptr;
+		return closed == false;
 	}
 	bool Window::isVisible() const {
 		return (SDL_GetWindowFlags(window) & SDL_WINDOW_SHOWN) == SDL_WINDOW_SHOWN;
@@ -299,6 +312,17 @@ namespace ez::window {
 	bool Window::pollInput(ez::InputEvent& ev) {
 		SDL_Event sdlev;
 		if (SDL_PollEvent(&sdlev)) {
+			ev = remapSDLEvent(sdlev);
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	bool Window::waitInput(ez::InputEvent& ev, int millis) {
+		SDL_Event sdlev;
+		if (SDL_WaitEventTimeout(&sdlev, millis)) {
 			ev = remapSDLEvent(sdlev);
 			return true;
 		}

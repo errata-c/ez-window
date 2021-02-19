@@ -40,8 +40,6 @@ namespace ez::window {
 			None
 		};
 
-		RenderSettings() noexcept;
-
 		Type getType() const;
 
 		GLSettings& asGLSettings();
@@ -54,6 +52,7 @@ namespace ez::window {
 
 	protected:
 		RenderSettings(Type _type) noexcept;
+		RenderSettings() noexcept;
 
 		struct GLData {
 			Bits colorBits, accumBits;

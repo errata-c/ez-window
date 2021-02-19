@@ -17,6 +17,34 @@ namespace ez::window {
 	bool isScreenSaverAllowed() {
 		return SDL_IsScreenSaverEnabled() == SDL_TRUE;
 	}
+
+	glm::ivec2 getMousePos() {
+		glm::ivec2 mp;
+		SDL_GetMouseState(&mp.x, &mp.y);
+		return mp;
+	}
+
+	ez::MouseButtons getMouseState() {
+		int state = SDL_GetMouseState(nullptr, nullptr);
+
+		ez::MouseButtons buttons;
+		if (state & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+			buttons.press(ez::Mouse::Left);
+		}
+		if (state & SDL_BUTTON(SDL_BUTTON_RIGHT)) {
+			buttons.press(ez::Mouse::Right);
+		}
+		if (state & SDL_BUTTON(SDL_BUTTON_MIDDLE)) {
+			buttons.press(ez::Mouse::Middle);
+		}
+		if (state & SDL_BUTTON(SDL_BUTTON_X1)) {
+			buttons.press(ez::Mouse::Button4);
+		}
+		if (state & SDL_BUTTON(SDL_BUTTON_X2)) {
+			buttons.press(ez::Mouse::Button5);
+		}
+		return buttons;
+	}
 };
 
 namespace ez::display {

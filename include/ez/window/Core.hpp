@@ -1,4 +1,6 @@
 #pragma once
+#include <glm/vec2.hpp>
+#include <ez/input/Mouse.hpp>
 
 namespace ez::window {
 	class Cursor;
@@ -6,11 +8,7 @@ namespace ez::window {
 	bool captureMouse(bool val);
 	void allowScreenSaver(bool val);
 	bool isScreenSaverAllowed();
-};
 
-namespace ez::display {
-	// Number of displays
-	int count();
-
-	// Other display functions, decide how to handle return values.
+	glm::ivec2 getMousePos();
+	ez::MouseButtons getMouseState();
 };

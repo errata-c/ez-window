@@ -15,6 +15,6 @@ namespace ez::window {
 				window->draw();
 			}
 		}
-		void processCommandLine(int argc, char** argv) {};
+		void processCommandLine(int argc, char* argv[]) override {};
 	};
 }

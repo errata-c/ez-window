@@ -22,19 +22,27 @@ add_library(ez-window STATIC
 	"src/Window.cpp"
 	"src/Core.cpp"
 	"src/Cursor.cpp"
+	"src/Display.cpp"
 	#"$<$<PLATFORM_ID:Windows>:src/intern/msw.cpp>"
 	#"$<$<PLATFORM_ID:Linux>:src/intern/x11.cpp>"
 	#"$<$<PLATFORM_ID:iOS>:src/intern/ios.cpp>"
 	#"$<$<PLATFORM_ID:Android>:src/intern/android.cpp>"
 	#"$<$<PLATFORM_ID:Darwin>:src/intern/darwin.cpp>"
 )
-target_link_libraries(ez-window PUBLIC ez-input ez-glcompat SDL2::SDL2 SDL2::SDL2main)
-
+target_link_libraries(ez-window 
+	PUBLIC ez::input ez::glcompat 
+	PRIVATE SDL2::SDL2
+)
 target_include_directories(ez-window PUBLIC 
 	"$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
 	"$<INSTALL_INTERFACE:include>"
 )
 target_compile_features(ez-window PUBLIC cxx_std_17)
+set_target_properties(ez-window PROPERTIES 
+	WIN32_EXECUTABLE "$<IF:$<AND:$<CONFIG:Debug>,$<PLATFORM_ID:Windows>>,TRUE,FALSE>"
+	EXPORT_NAME "window"
+)
+
 
 if(${BUILD_TESTS})
 	add_subdirectory("tests")
@@ -57,9 +65,12 @@ install(TARGETS "ez-window"
 
 install_package(
 	NAME "ez-window"
+	NAMESPACE "ez::"
 	EXPORT "ez-window-targets"
 	VERSION "${EZ_WINDOW_VERSION}"
 	COMPATIBILITY "SameMajorVersion"
 	DESTINATION DEFAULT
 	PRECONFIG "preconfig.cmake"
 )
+
+file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/genex.txt" CONTENT "$<TARGET_PROPERTY:ez-window,COMPILE_OPTIONS>")

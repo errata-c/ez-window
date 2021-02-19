@@ -5,6 +5,7 @@
 #include <string_view>
 #include <cstdio>
 #include <cassert>
+#include <chrono>
 
 #include "Window.hpp"
 
@@ -25,7 +26,13 @@ namespace ez::window {
 		bool contains(Window const * const window) const noexcept;
 		bool contains(std::string_view name) const noexcept;
 
-		int run(int argc, char ** argv);
+		bool isRealtime() const noexcept;
+		void setRealtime(bool val) noexcept;
+
+		void setDelayMicroseconds(uint64_t period) noexcept;
+		uint64_t getDelayMicroseconds() const noexcept;
+
+		int run(int argc, char* argv[]);
 
 		/// <summary>
 		/// To be overloaded by a specific engine implementation. Called on a per-frame
@@ -53,18 +60,18 @@ namespace ez::window {
 		/// </summary>
 		/// <param name="argc">The number of arguments passed.</param>
 		/// <param name="argv">The array of c-string arguments.</param>
-		virtual void processCommandLine(int argc, char** argv) = 0;
+		virtual void processCommandLine(int argc, char* argv[]) = 0;
 
-
-		// Functions only for default backends.
-		//std::shared_ptr<Window> make(std::string_view name);
-		//std::shared_ptr<Window> make(glm::ivec2 pos, glm::ivec2 size, std::string_view name);
+		
 	private:
-		bool running;
+		bool running, realtime;
+		std::chrono::microseconds delayPeriod;
 		std::vector<std::shared_ptr<Window>> windows;
 
 		void checkWindows();
 
 		void renderInternal();
+
+		bool hasEvent() const;
 	};
 }

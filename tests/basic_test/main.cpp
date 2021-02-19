@@ -26,7 +26,7 @@ public:
 	}
 };
 
-int main(int argc, char** argv) {
+int main(int argc, char* argv[]) {
 	// Create the engine.
 	ez_window::BasicEngine engine;
 
@@ -56,5 +56,7 @@ int main(int argc, char** argv) {
 		}
 	}
 
+	engine.setDelayMicroseconds(4000);
+	engine.setRealtime(false);
 	return engine.run(argc, argv);
 }
