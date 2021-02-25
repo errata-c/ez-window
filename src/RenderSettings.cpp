@@ -147,37 +147,7 @@ namespace ez::window {
 	VkInstance_T*& VulkanSettings::instance() {
 		return vulkanData.instance;
 	}
-	VkInstance_T const* const& VulkanSettings::instance() const {
+	VkInstance_T const* const VulkanSettings::instance() const {
 		return vulkanData.instance;
 	}
-}
-
-ez::window::GLContextFlags operator|(ez::window::GLContextFlags lh, ez::window::GLContextFlags rh) {
-	using ez::window::GLContextFlags;
-	return static_cast<GLContextFlags>(static_cast<int>(lh) | static_cast<int>(rh));
-}
-ez::window::GLContextFlags operator&(ez::window::GLContextFlags lh, ez::window::GLContextFlags rh) {
-	using ez::window::GLContextFlags;
-	return static_cast<GLContextFlags>(static_cast<int>(lh) & static_cast<int>(rh));
-}
-ez::window::GLContextFlags operator^(ez::window::GLContextFlags lh, ez::window::GLContextFlags rh) {
-	using ez::window::GLContextFlags;
-	return static_cast<GLContextFlags>(static_cast<int>(lh) ^ static_cast<int>(rh));
-}
-ez::window::GLContextFlags operator~(ez::window::GLContextFlags lh) {
-	using ez::window::GLContextFlags;
-	return static_cast<GLContextFlags>((~static_cast<int>(lh)) ) & GLContextFlags::All;
-}
-
-ez::window::GLContextFlags& operator|=(ez::window::GLContextFlags& lh, ez::window::GLContextFlags rh) {
-	lh = lh | rh;
-	return lh;
-}
-ez::window::GLContextFlags& operator&=(ez::window::GLContextFlags& lh, ez::window::GLContextFlags rh) {
-	lh = lh & rh;
-	return lh;
-}
-ez::window::GLContextFlags& operator^=(ez::window::GLContextFlags& lh, ez::window::GLContextFlags rh) {
-	lh = lh ^ rh;
-	return lh;
 }
