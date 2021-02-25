@@ -1,5 +1,6 @@
 #pragma once
 #include <cinttypes>
+#include <ez/BitFlags.hpp>
 
 // Predeclare actual structs, for compatibility
 struct VkInstance_T;
@@ -10,14 +11,32 @@ namespace ez::window {
 	// Opengl and vulkan support sharing
 	// Swap interval is important as well.
 
-	enum class GLContextFlags {
-		None = 0,
-		ForwardCompatible = 1,
-		Debug = 2,
-		RobustAccess = 4,
-		NoError = 8,
-		All = 0xF,
+	enum class GLContextOption {
+		ForwardCompatible = 0,
+		Debug,
+		RobustAccess,
+		NoError,
+		_Count,
+		_EnableOperators
 	};
+	using GLContextFlagsBase = ez::BitFlags<GLContextOption>;
+
+	struct GLContextFlags: public GLContextFlagsBase {
+		using GLContextFlagsBase::None;
+		using GLContextFlagsBase::All;
+
+		static constexpr GLContextFlagsBase ForwardCompatible{ GLContextOption::ForwardCompatible };
+		static constexpr GLContextFlagsBase Debug{ GLContextOption::Debug };
+		static constexpr GLContextFlagsBase RobustAccess{ GLContextOption::RobustAccess };
+		static constexpr GLContextFlagsBase NoError{ GLContextOption::NoError };
+		
+		using GLContextFlagsBase::GLContextFlagsBase;
+
+		constexpr GLContextFlags(const GLContextFlagsBase& val)
+			: GLContextFlagsBase(val)
+		{};
+	};
+
 	enum class GLProfile {
 		Default = 0,
 		Core,
@@ -115,15 +134,6 @@ namespace ez::window {
 		VulkanSettings(VkInstance_T * _instance) noexcept;
 
 		VkInstance_T*& instance();
-		VkInstance_T const*const & instance() const;
+		VkInstance_T const*const instance() const;
 	};
 };
-
-ez::window::GLContextFlags operator|(ez::window::GLContextFlags lh, ez::window::GLContextFlags rh);
-ez::window::GLContextFlags operator&(ez::window::GLContextFlags lh, ez::window::GLContextFlags rh);
-ez::window::GLContextFlags operator^(ez::window::GLContextFlags lh, ez::window::GLContextFlags rh);
-ez::window::GLContextFlags operator~(ez::window::GLContextFlags lh);
-
-ez::window::GLContextFlags& operator|=(ez::window::GLContextFlags& lh, ez::window::GLContextFlags rh);
-ez::window::GLContextFlags& operator&=(ez::window::GLContextFlags& lh, ez::window::GLContextFlags rh);
-ez::window::GLContextFlags& operator^=(ez::window::GLContextFlags& lh, ez::window::GLContextFlags rh);

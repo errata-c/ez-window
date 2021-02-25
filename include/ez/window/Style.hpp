@@ -1,20 +1,5 @@
 #pragma once
-
-namespace ez::window {
-	class Style;
-	enum class StylePreset;
-};
-
-ez::window::Style (operator|)(const ez::window::Style& lv, const ez::window::Style& rv) noexcept;
-ez::window::Style (operator&)(const ez::window::Style& lv, const ez::window::Style& rv) noexcept;
-ez::window::Style (operator~)(const ez::window::Style& lv) noexcept;
-
-// Conversion operators, allows presets to be used directly with Style class
-ez::window::Style(operator|)(const ez::window::StylePreset& lv, const ez::window::Style& rv) noexcept;
-ez::window::Style(operator&)(const ez::window::StylePreset& lv, const ez::window::Style& rv) noexcept;
-//ez::window::Style(operator|)(const ez::window::Style& lv, const ez::window::StylePreset& rv) noexcept;
-//ez::window::Style(operator&)(const ez::window::Style& lv, const ez::window::StylePreset& rv) noexcept;
-ez::window::Style(operator~)(const ez::window::StylePreset& lv) noexcept;
+#include <ez/BitFlags.hpp>
 
 namespace ez::window {
 	// Individual options
@@ -26,58 +11,37 @@ namespace ez::window {
 		AlwaysOnTop,
 		Fullscreen,
 		_Count,
+		_EnableOperators
 	};
 
-	// Option presets
-	enum class StylePreset {
-		None = 0,
-		Default = (1 << (int)StyleOption::Resize) | (1 << (int)StyleOption::Close) | (1 << (int)StyleOption::Visible),
-		Borderless = (1 << (int)StyleOption::Visible),
-		All = (1 << (int)StyleOption::_Count) -1,
+	using StyleBase = ez::BitFlags<StyleOption>;
+	struct Style : public StyleBase {
+		using StyleBase::None;
+		using StyleBase::All;
+
+		static constexpr StyleBase Resize{ StyleOption::Resize };
+		static constexpr StyleBase Close{ StyleOption::Close };
+		static constexpr StyleBase Visible{ StyleOption::Visible };
+		static constexpr StyleBase HighDPI{ StyleOption::HighDPI };
+		static constexpr StyleBase AlwaysOnTop{ StyleOption::AlwaysOnTop };
+		static constexpr StyleBase Fullscreen{ StyleOption::Fullscreen };
+		
+		using StyleBase::StyleBase;
+
+		constexpr Style(const StyleBase& val)
+			: StyleBase(val)
+		{};
 	};
 
-	// Actual style class, combines the options as a set of flags.
-	class Style {
-	public:
-		static constexpr StylePreset Resize = (StylePreset)(1 << (int)StyleOption::Resize);
-		static constexpr StylePreset Close = (StylePreset)(1 << (int)StyleOption::Close);
-		static constexpr StylePreset Visible = (StylePreset)(1 << (int)StyleOption::Visible);
-		static constexpr StylePreset HighDPI = (StylePreset)(1 << (int)StyleOption::HighDPI);
-		static constexpr StylePreset AlwaysOnTop = (StylePreset)(1 << (int)StyleOption::AlwaysOnTop);
-		static constexpr StylePreset Fullscreen = (StylePreset)(1 << (int)StyleOption::Fullscreen);
+	namespace StylePreset {
+		static constexpr Style None = Style::None;
 
-		static constexpr StylePreset None = StylePreset::None;
-		static constexpr StylePreset Default = StylePreset::Default;
-		static constexpr StylePreset Borderless = StylePreset::Borderless;
-		static constexpr StylePreset All = StylePreset::All;
+		static constexpr Style Default = Style::Resize | Style::Close | Style::Visible;
 
-		Style(const Style&) noexcept = default;
-		~Style() = default;
-		Style& operator=(const Style&) noexcept = default;
+		static constexpr Style Borderless = Style::Visible;
 
-		Style() noexcept;
-		Style(StyleOption opt) noexcept;
-		Style(StylePreset preset) noexcept;
-
-		bool allOf(const Style& val) const noexcept;
-		bool noneOf(const Style& val) const noexcept;
-		bool anyOf(const Style& val) const noexcept;
-
-		void clear() noexcept;
-
-		Style& operator|=(const Style& rv) noexcept;
-		Style& operator&=(const Style& rv) noexcept;
-		Style& operator^=(const Style& rv) noexcept;
-
-		explicit operator bool() const;
-
-		bool operator==(const Style& other) const noexcept;
-		bool operator!=(const Style& other) const noexcept;
-
-		friend ez::window::Style (::operator~)(const ez::window::Style&) noexcept;
-	private:
-		int value;
-	};
+		static constexpr Style All = Style::All;
+	}
 };
 
 

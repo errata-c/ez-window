@@ -37,7 +37,7 @@ int main(int argc, char* argv[]) {
 	gset.colorBits() = { 8,8,8,8 };
 
 	// Create a window class, give it to the engine.
-	CustomWindow* win = new CustomWindow{ "Basic Test", {800, 600}, ez_window::Style::Default, gset };
+	CustomWindow* win = new CustomWindow{ "Basic Test", {800, 600}, ez_window::StylePreset::Default, gset };
 	engine.add(win);
 
 	fmt::print("There are {} displays.\n", SDL_GetNumVideoDisplays());

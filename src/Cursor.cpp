@@ -5,7 +5,47 @@ namespace ez::window {
 	Cursor::Cursor(SystemCursor type)
 		: cursor(nullptr)
 	{
-		cursor = SDL_CreateSystemCursor(static_cast<SDL_SystemCursor>(type));
+		SDL_SystemCursor result;
+
+		switch (type) {
+		case SystemCursor::Arrow:
+			result = SDL_SYSTEM_CURSOR_ARROW;
+			break;
+		case SystemCursor::IBeam:
+			result = SDL_SYSTEM_CURSOR_IBEAM;
+			break;
+		case SystemCursor::Wait:
+			result = SDL_SYSTEM_CURSOR_WAIT;
+			break;
+		case SystemCursor::SmallWait:
+			result = SDL_SYSTEM_CURSOR_WAITARROW;
+			break;
+		case SystemCursor::Crosshair:
+			result = SDL_SYSTEM_CURSOR_CROSSHAIR;
+			break;
+		case SystemCursor::Hand:
+			result = SDL_SYSTEM_CURSOR_HAND;
+			break;
+		case SystemCursor::SizeH:
+			result = SDL_SYSTEM_CURSOR_SIZEWE;
+			break;
+		case SystemCursor::SizeV:
+			result = SDL_SYSTEM_CURSOR_SIZENS;
+			break;
+		case SystemCursor::SizeAll:
+			result = SDL_SYSTEM_CURSOR_SIZEALL;
+			break;
+		case SystemCursor::SizeFDiag:
+			result = SDL_SYSTEM_CURSOR_SIZENESW;
+			break;
+		case SystemCursor::SizeBDiag:
+			result = SDL_SYSTEM_CURSOR_SIZENWSE;
+			break;
+		case SystemCursor::Disabled:
+			result = SDL_SYSTEM_CURSOR_NO;
+			break;
+		}
+		cursor = SDL_CreateSystemCursor(result);
 	}
 	Cursor::~Cursor() {
 		if (cursor) {

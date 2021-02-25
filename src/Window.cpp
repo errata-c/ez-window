@@ -51,7 +51,7 @@ namespace ez::window {
 			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, gset.multisampleBuffers());
 			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, gset.multisampleSamples());
 
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, static_cast<int>(gset.flags()));
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, static_cast<int>(gset.flags().rawValue()));
 			switch (gset.profile()) {
 			case GLProfile::Default:
 				break;
@@ -312,7 +312,7 @@ namespace ez::window {
 	bool Window::pollInput(ez::InputEvent& ev) {
 		SDL_Event sdlev;
 		if (SDL_PollEvent(&sdlev)) {
-			ev = remapSDLEvent(sdlev);
+			ev = ez::input::remapEvent(sdlev);
 			return true;
 		}
 		else {
@@ -323,7 +323,7 @@ namespace ez::window {
 	bool Window::waitInput(ez::InputEvent& ev, int millis) {
 		SDL_Event sdlev;
 		if (SDL_WaitEventTimeout(&sdlev, millis)) {
-			ev = remapSDLEvent(sdlev);
+			ev = ez::input::remapEvent(sdlev);
 			return true;
 		}
 		else {
