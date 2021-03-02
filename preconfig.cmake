@@ -3,8 +3,8 @@ if(NOT TARGET ez::input)
 	find_dependency(ez-input CONFIG)
 endif()
 
-if(NOT TARGET ez::glcompat)
-	find_dependency(ez-glcompat CONFIG)
+if(NOT TARGET rt::loader)
+	find_dependency(rt::loader CONFIG)
 endif()
 
 if(NOT TARGET SDL2::SDL2)

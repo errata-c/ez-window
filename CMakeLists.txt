@@ -12,7 +12,7 @@ find_package(ez-cmake CONFIG REQUIRED)
 
 find_package(ez-bitflags CONFIG REQUIRED)
 find_package(ez-input CONFIG REQUIRED)
-find_package(ez-glcompat CONFIG REQUIRED)
+find_package(rt-loader CONFIG REQUIRED)
 
 find_package(SDL2 CONFIG REQUIRED)
 
@@ -30,7 +30,7 @@ add_library(ez-window STATIC
 	#"$<$<PLATFORM_ID:Darwin>:src/intern/darwin.cpp>"
 )
 target_link_libraries(ez-window 
-	PUBLIC ez::bitflags ez::input ez::glcompat 
+	PUBLIC ez::bitflags ez::input rt::loader 
 	PRIVATE SDL2::SDL2
 )
 target_include_directories(ez-window PUBLIC 
