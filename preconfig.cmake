@@ -4,7 +4,7 @@ if(NOT TARGET ez::input)
 endif()
 
 if(NOT TARGET rt::loader)
-	find_dependency(rt::loader CONFIG)
+	find_dependency(rt-loader CONFIG)
 endif()
 
 if(NOT TARGET SDL2::SDL2)
