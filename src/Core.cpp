@@ -25,9 +25,10 @@ namespace ez::window {
 	}
 
 	ez::MouseButtons getMouseState() {
-		int state = SDL_GetMouseState(nullptr, nullptr);
+		uint32_t state = SDL_GetMouseState(nullptr, nullptr);
 
-		ez::MouseButtons buttons;
+		ez::MouseButtons buttons = ez::MouseButtons::None;
+
 		if (state & SDL_BUTTON(SDL_BUTTON_LEFT)) {
 			buttons.press(ez::Mouse::Left);
 		}

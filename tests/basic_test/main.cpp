@@ -4,7 +4,7 @@
 
 #include <ez/window/BasicEngine.hpp>
 #include <ez/window/Window.hpp>
-
+#include <ez/window/Core.hpp>
 
 class CustomWindow : public ez::window::Window {
 public:
@@ -13,13 +13,15 @@ public:
 	{}
 
 	void handleInput() override {
-		//fmt::print("{}\n", ev.to_string());
 		ez::InputEvent ev;
 		while (pollInput(ev)) {
+			fmt::print("{}\n", ez::to_string(ev));
 			if (ev.type == ez::InputEventType::Closed) {
 				close();
 			}
 		}
+
+		ez::MouseButtons buttons = ez::window::getMouseState();
 	}
 	void draw() override {
 
