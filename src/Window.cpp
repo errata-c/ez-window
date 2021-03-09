@@ -2,6 +2,8 @@
 #include <ez/input/compat/SDL2.hpp>
 #include "SDL2/SDL.h"
 
+#include <rt/loader.hpp>
+
 namespace ez::window {
 	Window::Window(std::string_view _title, glm::ivec2 size, Style _style, const RenderSettings& rs)
 		: style(_style& (Style::Resize | Style::Visible | Style::Close | Style::Fullscreen | Style::HighDPI))
@@ -86,9 +88,13 @@ namespace ez::window {
 		}
 		else {
 			switch (rs.getType()) {
-			case RenderSettings::Type::OpenGL:
+			case RenderSettings::Type::OpenGL: {
 				rctx = SDL_GL_CreateContext(window);
+				setActive(true);
+				bool result = rt::load();
+				assert(result && "Failed to load the opengl functions.");
 				break;
+			}
 			case RenderSettings::Type::Vulkan:
 
 				break;
@@ -99,7 +105,11 @@ namespace ez::window {
 	}
 
 	Window::~Window() {
-		SDL_GL_DeleteContext(rctx);
+		if (rctx != nullptr) {
+			SDL_GL_DeleteContext(rctx);
+			rctx = nullptr;
+		}
+		
 		SDL_DestroyWindow(window);
 		window = nullptr;
 	}
@@ -311,13 +321,14 @@ namespace ez::window {
 
 	bool Window::pollInput(ez::InputEvent& ev) {
 		SDL_Event sdlev;
-		if (SDL_PollEvent(&sdlev)) {
+
+		while (SDL_PollEvent(&sdlev)) {
 			ev = ez::input::remapEvent(sdlev);
-			return true;
+			if (ev.type != ez::InEv::None) {
+				return true;
+			}
 		}
-		else {
-			return false;
-		}
+		return false;
 	}
 
 	bool Window::waitInput(ez::InputEvent& ev, int millis) {
