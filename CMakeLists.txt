@@ -6,6 +6,7 @@ LANGUAGES C CXX
 )
 
 option(BUILD_TESTS "Build the tests for the ez-window library" ON)
+option(SEPARATE_DIRECTORY "Install the package into its own directory" ON)
 
 include(GNUInstallDirs)
 find_package(ez-cmake CONFIG REQUIRED)
@@ -48,7 +49,9 @@ if(${BUILD_TESTS})
 	add_subdirectory("tests")
 endif()
 
-set(CMAKE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX}/ez-window)
+if(SEPARATE_DIRECTORY)
+	set(CMAKE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX}/ez-window)
+endif()
 
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/"
 	TYPE INCLUDE
@@ -72,5 +75,3 @@ install_package(
 	DESTINATION DEFAULT
 	PRECONFIG "preconfig.cmake"
 )
-
-file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/genex.txt" CONTENT "$<TARGET_PROPERTY:ez-window,COMPILE_OPTIONS>")
