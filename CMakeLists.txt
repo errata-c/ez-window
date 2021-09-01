@@ -1,19 +1,11 @@
 cmake_minimum_required(VERSION 3.15)
 
 project(EZ_WINDOW
-VERSION 0.2.1
-LANGUAGES C CXX
+	VERSION 0.2.1
+	LANGUAGES C CXX
 )
 
-include(GNUInstallDirs)
-include(FetchContent)
-
-FetchContent_Declare(
-	ez-cmake
-	GIT_REPOSITORY "https://github.com/errata-c/ez-cmake.git"
-	GIT_TAG "a59477ebb9d8ce1f686b99118586310f47cb7a80"
-)
-FetchContent_MakeAvailable(ez-cmake)
+include(cmake/defaults.cmake)
 
 option(BUILD_TESTS "Build the test executables" ON)
 option(SEPARATE_DIRECTORY "Install the package into its own directory" ON)
