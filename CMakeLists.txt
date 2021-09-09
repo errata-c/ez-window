@@ -5,7 +5,16 @@ project(EZ_WINDOW
 	LANGUAGES C CXX
 )
 
-include(cmake/defaults.cmake)
+include(GNUInstallDirs)
+include(FetchContent)
+
+FetchContent_Declare(
+	ez-cmake
+	GIT_REPOSITORY "https://github.com/errata-c/ez-cmake.git"
+	GIT_TAG "main"
+)
+FetchContent_MakeAvailable(ez-cmake)
+
 
 option(BUILD_TESTS "Build the test executables" ON)
 option(SEPARATE_DIRECTORY "Install the package into its own directory" ON)
